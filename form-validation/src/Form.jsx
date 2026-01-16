@@ -1,11 +1,21 @@
 import { useForm } from "react-hook-form";
 import { DevTool } from "@hookform/devtools";
+import { useEffect } from "react";
 const Form = () => {
-  const { register, handleSubmit, control, formState } = useForm({
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState,
+    watch,
+    getValues,
+    reset,
+    trigger,
+  } = useForm({
     defaultValues: {
-      name: "John Doe",
-      email: "john@example.com",
-      age: 23,
+      name: "",
+      email: "",
+      age: "",
       social: {
         facebook: "",
         twitter: "",
@@ -13,6 +23,7 @@ const Form = () => {
       phoneNumber: ["", ""],
       dob: new Date(),
     },
+    // mode: "onChange",
   });
 
   //   const { register, handleSubmit, control, formState } = useForm({
@@ -29,17 +40,50 @@ const Form = () => {
   //     },
   //   });
 
-  const { errors } = formState;
+  const {
+    errors,
+    dirtyFields,
+    touchedFields,
+    isDirty,
+    isValid,
+    isSubmitting,
+    isSubmitted,
+    isSubmitSuccessful,
+    submitCount,
+  } = formState;
+  // console.log({ dirtyFields, touchedFields, isDirty });
+  console.log({ isSubmitting, isSubmitted, isSubmitSuccessful, submitCount });
 
-  console.log(useForm());
+  // console.log(useForm());
 
   const onSubmit = (data) => {
     console.log(data);
   };
 
+  // const watchForm = watch();
+
+  // useEffect(() => {
+  //   console.log(watchForm);
+  // }, [watchForm]);
+
+  const getFormValues = () => {
+    const values = getValues();
+    console.log(values);
+  };
+  const onError = (errors) => {
+    console.log("Errors: ", errors);
+  };
+
+  useEffect(() => {
+    if (isSubmitSuccessful) {
+      reset();
+    }
+  }, [isSubmitSuccessful]);
+
   return (
     <div>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      {/* <p>{JSON.stringify(watchForm)}</p>   */}
+      <form onSubmit={handleSubmit(onSubmit, onError)}>
         <label htmlFor="name">Name</label>
         <br />
         <input
@@ -52,13 +96,13 @@ const Form = () => {
         {errors.name && <p className="error">{errors.name.message}</p>}
         <br />
         <br />
-
         <label htmlFor="email">Email</label>
         <br />
         <input
           type="text"
           id="email"
           {...register("email", {
+            // disabled: watch("name") === "",
             required: "Email is required",
             pattern: {
               value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
@@ -74,13 +118,19 @@ const Form = () => {
                   "This domain is not allowed"
                 );
               },
+              availableEmail: async (value) => {
+                const response = await fetch(
+                  `https://jsonplaceholder.typicode.com/users?email=${value}`
+                );
+                const data = await response.json();
+                return data.length === 0 || "Email already exists";
+              },
             },
           })}
         />
         {errors.email && <p className="error">{errors.email.message}</p>}
         <br />
         <br />
-
         <label htmlFor="age">Age</label>
         <br />
         <input
@@ -100,7 +150,57 @@ const Form = () => {
           })}
         />
         {errors.age && <p className="error">{errors.age.message}</p>}
-
+        <br />
+        <br />
+        <label htmlFor="country">Country</label>
+        <select id="country" {...register("country")}>
+          <option value="">Select Country</option>
+          <option value="india">India</option>
+          <option value="pakistan">Pakistan</option>
+          <option value="bangladesh">Bangladesh</option>
+        </select>
+        <br /> <br />
+        <label htmlFor="gender">
+          Gender <br />
+          <label htmlFor="gender">
+            <input
+              type="radio"
+              value="male"
+              {...register("gender", {
+                required: true,
+              })}
+            />{" "}
+            Male
+          </label>
+          <label htmlFor="gender">
+            <input type="radio" value="female" {...register("gender")} /> Female
+          </label>
+          {errors.gender && <p className="error">Gender is required</p>}
+        </label>{" "}
+        <br />
+        <br />
+        <label htmlFor="skills">
+          Skills <br />
+          <label htmlFor="skills">
+            <input
+              type="checkbox"
+              value="node"
+              {...register("skills", {
+                required: true,
+              })}
+            />{" "}
+            Node
+          </label>
+          <label htmlFor="skills">
+            <input type="checkbox" value="react" {...register("skills")} />{" "}
+            React
+          </label>
+          <label htmlFor="skills">
+            <input type="checkbox" value="mongodb" {...register("skills")} />{" "}
+            MongoDB
+          </label>
+          {errors.gender && <p className="error">Skills is required</p>}
+        </label>
         <br />
         <br />
         <label htmlFor="primary-phonenumber">Primary Phone Number</label>
@@ -110,10 +210,8 @@ const Form = () => {
           id="primary-phonenumber"
           {...register("phonenumber.0")}
         />
-
         <br />
         <br />
-
         <label htmlFor="secondary-phonenumber">Secondary Phone Number</label>
         <br />
         <input
@@ -121,10 +219,8 @@ const Form = () => {
           id="secondary-phonenumber"
           {...register("phonenumber.1")}
         />
-
         <br />
         <br />
-
         <label htmlFor="dob">DOB </label>
         <br />
         <input
@@ -134,20 +230,31 @@ const Form = () => {
             valueAsDate: true,
           })}
         />
-
         <br />
         <br />
         <label htmlFor="facebook">Facebook</label>
         <br />
         <input type="text" id="facebook" {...register("social.facebook")} />
-
         <br />
         <br />
         <label htmlFor="facebook">Twitter</label>
         <br />
         <input type="text" id="twitter" {...register("social.twitter")} />
-
-        <button type="submit">Submit</button>
+        <br />
+        <br />
+        <button
+          type="submit"
+          // disabled={!isValid}
+        >
+          Submit
+        </button>
+        <button type="button" onClick={getFormValues}>
+          Get Values
+        </button>
+        <button type="button" onClick={() => trigger()}>
+          Validate
+        </button>
+        <button onClick={() => reset()}> Reset</button>
       </form>
       <DevTool control={control} placement="top-left" />
     </div>
