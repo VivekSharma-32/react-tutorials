@@ -1,0 +1,46 @@
+{
+    "users": [
+        {
+            "id": 1,
+            "name": "John Doe",
+            "username": "johndoe",
+            "email": "Y2Hwq@example.com",
+            "age": 25
+        },
+        {
+            "id": 2,
+            "name": "Jane Doe",
+            "username": "janedoe",
+            "email": "Y2Hwq@example.com",
+            "age": 27
+        },
+        {
+            "id": 3,
+            "name": "Rome Doe",
+            "username": "romedoe",
+            "email": "Y2Hwq@example.com",
+            "age": 25
+        },
+        {
+            "id": 4,
+            "name": "Tom Doe",
+            "username": "tomdoe",
+            "email": "Y2Hwq@example.com",
+            "age": 27
+        },
+        {
+            "id": 5,
+            "name": "Kon Doe",
+            "username": "kondoe",
+            "email": "Y2Hwq@example.com",
+            "age": 25
+        },
+        {
+            "id": 6,
+            "name": "Mon Doe",
+            "username": "mondoe",
+            "email": "Y2Hwq@example.com",
+            "age": 27
+        }
+    ]
+}
